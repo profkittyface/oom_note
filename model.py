@@ -13,10 +13,6 @@ Session = sessionmaker(bind=engine)
 
 
 class User(base):
-    # def __init__(self):
-    #     self.__is_authenticated = False
-    #     self.__is_active = False
-    #     self.__is_anonymous = False
     __tablename__ = 'users'
     id = Column(Integer, Sequence('users_id_seq'), primary_key=True)
     username = Column(String)
@@ -28,32 +24,6 @@ class User(base):
 
     def __repr__(self):
         return "<User(id={}, username={})".format(self.id, self.username)
-
-    # # flask-login
-    # __is_authenticated = True
-    # __is_active = True
-    # __is_anonymous = False
-    #
-    # def get_is_authenticated(self):
-    #     return self.__is_authenticated
-    # def set_is_authenticated(self, is_authenticated):
-    #     self.__is_authenticated = is_authenticated
-    # is_authenticated = property(get_is_authenticated, set_is_authenticated)
-    #
-    # def get_is_active(self):
-    #      return self.__is_active
-    # def set_is_active(self, is_active):
-    #     self.__is_active = is_active
-    # is_active = property(get_is_active, set_is_active)
-    #
-    # def get_is_anonymous(self):
-    #     return self.__is_anonymous
-    # def set_is_anonymous(self, is_anonymous):
-    #     self.__is_anonymous = is_anonymous
-    # is_anonymous = property(get_is_anonymous, set_is_anonymous)
-    #
-    # def get_id(self):
-    #     return self.username
 
     @property
     def is_active(self):

@@ -2,10 +2,10 @@ from flask import Flask, render_template, redirect, flash, url_for, jsonify, req
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from config import Config
-from forms import LoginForm, CreateForm, UpdateForm
+from forms import LoginForm, SignupForm, CreateForm, UpdateForm
 from flask_login import login_user, LoginManager, login_required, current_user, logout_user
 from model import Session, User, Note
-from util import check_user_creds
+from util import check_user_creds, hash_password
 from response import ResponseGenerator
 
 app = Flask(__name__)
@@ -27,13 +27,37 @@ def index():
     print(g)
     return render_template('index.html')
 
+@app.route("/signup", methods=['GET', 'POST'])
+def signup():
+    form = SignupForm()
+    if form.validate_on_submit():
+        username = form.username.data
+        password = hash_password(form.password.data)
+        email = form.email.data
+        first_name = form.first_name.data
+        last_name = form.last_name.data
+
+        s = Session()
+        user = User(username=username,
+                    password=password,
+                    email=email,
+                    first_name=first_name,
+                    last_name=last_name)
+
+        user_exist = s.query(User).filter_by(username=username)
+        if user_exist != None:
+            flash('User already exists')
+            return render_template('signup.html', title='Sign Up', form=form)
+        s.add(user)
+        s.commit()
+    return render_template('signup.html', title='Sign Up', form=form)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
     if form.validate_on_submit():
         user = check_user_creds(
-            username=form.username.data, password=form.password.data)
+            username=form.username.data, password=hash_password(form.password.data))
         if user == False:
             flash('User or password incorrect')
             return redirect(url_for('login'))
